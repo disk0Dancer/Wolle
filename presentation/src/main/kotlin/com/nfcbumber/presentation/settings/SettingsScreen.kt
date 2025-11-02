@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.nfcbumber.BuildConfig
 import com.nfcbumber.domain.model.ThemeMode
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,7 +84,7 @@ fun SettingsScreen(
 
             ListItem(
                 headlineContent = { Text("Version") },
-                supportingContent = { Text("2.0.0") }
+                supportingContent = { Text(BuildConfig.VERSION_NAME) }
             )
 
             ListItem(

@@ -50,6 +50,44 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        
+        // Expose version name in BuildConfig for dynamic version display
+        buildConfigField("String", "VERSION_NAME", "\"${appVersionName}\"")
+    }
+
+    signingConfigs {
+        create("release") {
+            // ⚠️ SECURITY WARNING: Using debug keystore for development/testing only
+            // The debug keystore uses publicly known credentials and should NOT be used
+            // for production releases or apps distributed to untrusted users.
+            //
+            // This configuration enables APK installation without certificate errors,
+            // which is useful for:
+            // - Development builds shared with testers
+            // - Personal use builds
+            // - Open source projects without sensitive data
+            // 
+            // For production releases with proper signing:
+            // 1. Create a release keystore using Android Studio or keytool
+            // 2. Set environment variables or use gradle.properties:
+            //    - RELEASE_STORE_FILE=/path/to/release.keystore
+            //    - RELEASE_STORE_PASSWORD=your_password
+            //    - RELEASE_KEY_ALIAS=your_alias
+            //    - RELEASE_KEY_PASSWORD=your_key_password
+            val debugKeystorePath = "${System.getProperty("user.home")}/.android/debug.keystore"
+            val debugKeystoreFile = file(debugKeystorePath)
+            
+            if (debugKeystoreFile.exists()) {
+                storeFile = debugKeystoreFile
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            } else {
+                // If debug keystore doesn't exist, signing will fail at build time
+                // This is intentional to prevent unsigned APKs
+                logger.warn("Debug keystore not found at: $debugKeystorePath")
+            }
+        }
     }
 
     buildTypes {
@@ -60,6 +98,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Only apply signing config if keystore exists
+            val releaseSigningConfig = signingConfigs.getByName("release")
+            if (releaseSigningConfig.storeFile?.exists() == true) {
+                signingConfig = releaseSigningConfig
+            }
         }
         debug {
             isMinifyEnabled = false
