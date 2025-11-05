@@ -82,6 +82,11 @@ class CardListViewModel @Inject constructor(
                         val firstCardId = cards.first().id
                         _selectedCardId.value = firstCardId
                         secureStorage.putLong(KEY_SELECTED_CARD_ID, firstCardId)
+                        // Activate emulation for auto-selected card
+                        emulationManager.activateEmulation(firstCardId)
+                    } else if (cards.isNotEmpty() && currentSelectedId != null && cardExists) {
+                        // Re-activate emulation for the currently selected card
+                        emulationManager.activateEmulation(currentSelectedId)
                     }
                 }
         }

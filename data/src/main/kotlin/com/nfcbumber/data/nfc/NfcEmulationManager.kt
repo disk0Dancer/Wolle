@@ -23,7 +23,8 @@ class NfcEmulationManager @Inject constructor(
 
     /**
      * Activate NFC emulation for a specific card.
-     * Called when CardEmulationActivity is opened or app is in foreground.
+     * Once activated, emulation stays active even when app is in background.
+     * This allows the phone to work as an access card/key fob.
      */
     fun activateEmulation(cardId: Long) {
         secureStorage.putLong(KEY_SELECTED_CARD_ID, cardId)
@@ -32,7 +33,7 @@ class NfcEmulationManager @Inject constructor(
 
     /**
      * Deactivate NFC emulation.
-     * Called when CardEmulationActivity is closed and app is in background.
+     * Only called when user explicitly deselects the card.
      */
     fun deactivateEmulation() {
         secureStorage.putBoolean(KEY_EMULATION_ACTIVE, false)
@@ -49,13 +50,11 @@ class NfcEmulationManager @Inject constructor(
     /**
      * Get the currently selected card ID for emulation.
      * Returns -1 if no card is selected.
+     * Always returns the selected card ID regardless of active state,
+     * allowing emulation to work even when app is in background.
      */
     fun getSelectedCardId(): Long {
-        return if (isEmulationActive()) {
-            secureStorage.getLong(KEY_SELECTED_CARD_ID, NO_CARD_SELECTED)
-        } else {
-            NO_CARD_SELECTED
-        }
+        return secureStorage.getLong(KEY_SELECTED_CARD_ID, NO_CARD_SELECTED)
     }
 
     /**

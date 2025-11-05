@@ -219,16 +219,9 @@ private fun EmptyContent(onAddCard: () -> Unit) {
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = "No Cards Yet",
+            text = "No Cards",
             style = MaterialTheme.typography.headlineMedium,
             textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Tap the + button to scan your first NFC card",
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(onClick = onAddCard) {
@@ -256,16 +249,9 @@ private fun EmptySearchContent(onClearSearch: () -> Unit) {
         )
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = "No Results Found",
+            text = "No Results",
             style = MaterialTheme.typography.headlineMedium,
             textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Try adjusting your search query",
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(onClick = onClearSearch) {
@@ -384,7 +370,7 @@ private fun CardItem(
             if (isSelected) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "⚡ Active - NFC signal is being emulated",
+                    text = "⚡ Active",
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.White.copy(alpha = 0.9f)
                 )

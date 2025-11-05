@@ -77,7 +77,8 @@ class MainActivity : ComponentActivity() {
         // Enable foreground dispatch for NFC
         nfcAdapter?.enableForegroundDispatch(this, pendingIntent, null, null)
 
-        // Restore NFC emulation if a card was previously selected
+        // Activate NFC emulation if a card was previously selected
+        // Keep emulation active even when app goes to background
         val selectedCardId = emulationManager.getSelectedCardId()
         if (selectedCardId != -1L) {
             emulationManager.activateEmulation(selectedCardId)
@@ -88,8 +89,8 @@ class MainActivity : ComponentActivity() {
         super.onPause()
         // Disable foreground dispatch
         nfcAdapter?.disableForegroundDispatch(this)
-        // Deactivate NFC emulation when app goes to background
-        emulationManager.deactivateEmulation()
+        // Keep NFC emulation active even when app goes to background
+        // This allows the phone to act as an access card/key fob
     }
 
     override fun onNewIntent(intent: Intent) {

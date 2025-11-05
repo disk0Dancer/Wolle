@@ -34,10 +34,10 @@ fun CardDetailsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Информация о карте") },
+                title = { Text("Card Info") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, "Назад")
+                        Icon(Icons.Default.ArrowBack, "Back")
                     }
                 }
             )
@@ -118,7 +118,7 @@ fun SafetyInfoCard() {
                     style = MaterialTheme.typography.headlineMedium
                 )
                 Text(
-                    text = "Безопасность устройства",
+                    text = "Security",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -126,15 +126,7 @@ fun SafetyInfoCard() {
             }
 
             Text(
-                text = """
-                    ✅ Приложение НЕ может повредить NFC модуль
-                    ✅ Использует официальный Android HCE API
-                    ✅ Работает на программном уровне
-                    ✅ Не модифицирует аппаратное обеспечение
-                    ✅ Все данные зашифрованы
-                    
-                    Android HCE - это безопасная технология от Google, которая работает так же, как Apple Pay или Google Pay. Миллионы устройств используют её ежедневно без каких-либо проблем.
-                """.trimIndent(),
+                text = "Uses official Android HCE API. All data encrypted.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -179,7 +171,7 @@ fun CompatibilityCard(compatibility: CardCompatibility) {
                 )
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Совместимость",
+                        text = "Compatibility",
                         style = MaterialTheme.typography.labelLarge,
                         color = iconColor
                     )
@@ -190,14 +182,6 @@ fun CompatibilityCard(compatibility: CardCompatibility) {
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                text = compatibility.getDescription(),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
         }
     }
 }
@@ -214,7 +198,7 @@ fun TechnicalDetailsCard(card: Card) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "Технические данные",
+                text = "Technical Data",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -233,8 +217,8 @@ fun TechnicalDetailsCard(card: Card) {
                 }
             }
 
-            DetailRow("Тип карты", card.cardType.name.replace('_', ' '))
-            DetailRow("Длина UID", "${card.uid.size} байт")
+            DetailRow("Type", card.cardType.name.replace('_', ' '))
+            DetailRow("UID Length", "${card.uid.size} bytes")
         }
     }
 }
@@ -278,24 +262,14 @@ fun IntercomInfoCard() {
                     style = MaterialTheme.typography.headlineMedium
                 )
                 Text(
-                    text = "Для домофонов",
+                    text = "Intercom Support",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
             }
 
             Text(
-                text = """
-                    Большинство домофонов используют Mifare Classic карты и читают только UID на низком уровне (антиколлизия).
-                    
-                    ⚠️ Android HCE не может эмулировать такие карты без root прав.
-                    
-                    Варианты решения:
-                    • Некоторые современные домофоны поддерживают ISO-DEP - попробуйте протестировать
-                    • Используйте физическую карту или NFC-кольцо
-                    • Приложения с root: NFC Card Emulator Pro
-                    • Обратитесь к управляющей компании для добавления телефона отдельным ключом
-                """.trimIndent(),
+                text = "MIFARE card detected. HCE emulation active.",
                 style = MaterialTheme.typography.bodyMedium
             )
         }

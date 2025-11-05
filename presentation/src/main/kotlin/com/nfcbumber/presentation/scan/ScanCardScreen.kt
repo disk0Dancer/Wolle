@@ -113,15 +113,9 @@ private fun ScanningPrompt() {
             tint = MaterialTheme.colorScheme.primary
         )
         Text(
-            text = "Hold your NFC card near the device",
+            text = "Scan NFC Card",
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center
-        )
-        Text(
-            text = "Place the card on the back of your device",
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
@@ -184,7 +178,7 @@ private fun CardScannedContent(
         )
 
         Text(
-            text = "Card Scanned Successfully!",
+            text = "Card Scanned",
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()

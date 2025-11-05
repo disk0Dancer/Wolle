@@ -57,12 +57,6 @@ class NfcEmulatorService : HostApduService() {
     }
 
     override fun processCommandApdu(commandApdu: ByteArray?, extras: Bundle?): ByteArray {
-        // Check if emulation is active
-        if (!emulationManager.isEmulationActive()) {
-            Log.d(TAG, "NFC emulation is not active, ignoring APDU command")
-            return SW_FILE_NOT_FOUND
-        }
-
         if (commandApdu == null) {
             Log.w(TAG, "Received null APDU command")
             return SW_UNKNOWN
@@ -70,6 +64,13 @@ class NfcEmulatorService : HostApduService() {
 
         val commandHex = commandApdu.toHexString()
         Log.d(TAG, "Received APDU: $commandHex")
+        
+        // Check if a card is selected for emulation
+        val selectedCardId = emulationManager.getSelectedCardId()
+        if (selectedCardId == NO_CARD_SELECTED) {
+            Log.d(TAG, "No card selected for emulation")
+            return SW_FILE_NOT_FOUND
+        }
 
         return try {
             when {
@@ -89,9 +90,24 @@ class NfcEmulatorService : HostApduService() {
                 commandApdu[1] == 0xCA.toByte() -> {
                     handleGetDataCommand(commandApdu)
                 }
+                // UPDATE BINARY (00 D6) and VERIFY (00 20) - some systems use these
+                commandApdu.size >= 2 && commandApdu[0] == 0x00.toByte() && 
+                (commandApdu[1] == 0xD6.toByte() || commandApdu[1] == 0x20.toByte()) -> {
+                    val cmdName = if (commandApdu[1] == 0xD6.toByte()) "UPDATE BINARY" else "VERIFY"
+                    Log.d(TAG, "$cmdName command - returning success")
+                    SW_SUCCESS
+                }
+                // For any other command, return success if we have a valid card
                 else -> {
                     Log.w(TAG, "Unknown APDU command: $commandHex")
-                    SW_COMMAND_NOT_ALLOWED
+                    val card = getSelectedCard()
+                    if (card != null) {
+                        // Return generic success for unknown commands for compatibility
+                        Log.d(TAG, "Returning success for unknown command")
+                        SW_SUCCESS
+                    } else {
+                        SW_COMMAND_NOT_ALLOWED
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -116,6 +132,7 @@ class NfcEmulatorService : HostApduService() {
      * Handle SELECT command (00 A4 04 00).
      * Verifies that the requested AID matches one of the card's AIDs.
      * Returns ATS (Answer To Select) if available.
+     * For access control systems, we're more permissive with AID matching.
      */
     private fun handleSelectCommand(commandApdu: ByteArray): ByteArray {
         Log.d(TAG, "Processing SELECT command")
@@ -135,16 +152,19 @@ class NfcEmulatorService : HostApduService() {
                 val requestedAid = commandApdu.copyOfRange(5, 5 + aidLength).toHexString()
                 Log.d(TAG, "Terminal requested AID: $requestedAid")
                 
-                // Check if the card supports this AID
+                // For access control and intercom systems, be more permissive
+                // Only reject if we have specific AIDs and none match
                 if (card.aids.isNotEmpty() && !card.aids.contains(requestedAid)) {
-                    Log.w(TAG, "Card does not support requested AID: $requestedAid")
-                    Log.d(TAG, "Card supports AIDs: ${card.aids.joinToString()}")
-                    // Return file not found for unsupported AID
-                    return SW_FILE_NOT_FOUND
+                    Log.w(TAG, "Card AID mismatch: requested=$requestedAid, available=${card.aids.joinToString()}")
+                    // For access control, still try to succeed - many systems are flexible
+                    Log.d(TAG, "Accepting AID anyway for compatibility with access control systems")
                 }
                 
-                Log.d(TAG, "AID matched, card selected: ${card.name}")
+                Log.d(TAG, "Card selected: ${card.name}")
             }
+        } else {
+            // Some access control readers might send shorter SELECT commands
+            Log.d(TAG, "Short SELECT command received, accepting for compatibility")
         }
         
         // Return ATS if available, otherwise just success
